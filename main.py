@@ -1,20 +1,18 @@
 from Code.utils.libraries import * 
 from Code.data.dataprocessing.extract.extract import *
+from Code.data.dataprocessing.load.load import *
+from sessions import *
+
+BASE_PATH=os.getenv('BASEPATH')
+CONN_URL = os.getenv('CONN_URL')
+PASSWORD = os.getenv('PASSWORD')
+USERNAME=os.getenv('USER_NAME')
+configur = ConfigParser() 
+configur.read(BASE_PATH+'config.ini')
+spark_path=configur.get('driver_path_pyspark','pyspark')
+spark_session=session(spark_driver=spark_path)
 
 
-def session():
-    spark = SparkSession.builder \
-    .appName("PySpark MySQL Example") \
-    .config("spark.driver.extraClassPath", "C:/spark/spark-3.5.0-bin-hadoop3/jars/mysql-connector-java-5.1.46.jar") \
-    .getOrCreate()
-    return spark
-spark_session=session()
-
-fetch_size=1000000
-df=extract_data(spark=spark_session,table_name=table_name,password=password,user_name=user_name,fetech_size=fetch_size,conn_url=conn_url)
-df.show()
-sys.exit()
-
-
-
-
+df=extract_data(spark=spark_session,table_name=configur.get('table_extract','product'),password=PASSWORD,user_name=USERNAME,fetech_size=configur.get('size','fetch_size'),conn_url=CONN_URL)
+dump_csv(df,file_path=configur.get('BasePath','Path'),table_name=configur.get('table_extract','product'))
+# sys.exit()
