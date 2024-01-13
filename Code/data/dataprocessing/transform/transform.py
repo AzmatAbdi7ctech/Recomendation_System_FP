@@ -15,3 +15,4 @@ def duplicate_col(data=None):
     df_cols[i] = df_cols[i] + '_duplicate_'+ str(i)
   data = data.toDF(*df_cols)
   return data
+

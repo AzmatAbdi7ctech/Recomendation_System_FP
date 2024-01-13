@@ -13,9 +13,7 @@ import re
 import nltk
 from nltk.stem import PorterStemmer
 from nltk.corpus import stopwords
-
 from nltk.stem import WordNetLemmatizer
-
 import sklearn as sk
 import numpy as np
 import re

@@ -38,8 +38,8 @@ def dump_csv(df=None, file_path=None, format='csv',table_name=None):
     """
 
     if format.lower() == 'csv':
-        pandas_df = df.toPandas()
-        pandas_df.head()
-        pandas_df.to_csv(f'{file_path+table_name}.csv', index=False)
+        print("file saved")
+        df.to_csv(f'{file_path+table_name}.csv', index=False)
+        
     else:
         raise ValueError("Unsupported format. Currently, only 'csv' format is supported.")
