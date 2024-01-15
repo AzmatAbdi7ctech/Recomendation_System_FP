@@ -15,31 +15,40 @@ PASSWORD = os.getenv('PASSWORD')
 USERNAME=os.getenv('USER_NAME')
 configur = ConfigParser() 
 configur.read(BASE_PATH+'config.ini')
-spark_path=configur.get('driver_path_pyspark','pyspark')
-spark_session=session(spark_driver=spark_path)
+spark_session=session(spark_driver=configur.get('driver_path_pyspark','pyspark'))
 
 
 
-df=extract_data(spark=spark_session,table_name=configur.get('table_extract','product'),password=PASSWORD,user_name=USERNAME,fetech_size=configur.get('size','fetch_size'),conn_url=CONN_URL)
-df=product_transformation(df)
-dump_csv(df,file_path=configur.get('BasePath','Path'),table_name=configur.get('table_extract','product'))
+print('product')
+dump_csv(product_transformation
+        (
+        extract_data(spark=spark_session,table_name=configur.get('table_extract','product'),
+        password=PASSWORD,user_name=USERNAME,fetech_size=configur.get('size','fetch_size'),conn_url=CONN_URL)
+        ),file_path=configur.get('BasePath','Path'),table_name=configur.get('table_extract','product')
+        )
 
-df=extract_data(spark=spark_session,table_name=configur.get('table_extract','product_tag'),
-                password=PASSWORD,user_name=USERNAME,fetech_size=configur.get('size','fetch_size'),conn_url=CONN_URL)
-df=producttag_transformation(df)
-dump_csv(df,file_path=configur.get('BasePath','Path'),table_name=configur.get('table_extract','product_tag'))
 
-df=extract_data(spark=spark_session,table_name=configur.get('table_extract','collection_category'),
-                password=PASSWORD,user_name=USERNAME,fetech_size=configur.get('size','fetch_size'),conn_url=CONN_URL)
-df=collection_category_transformation(df)
-dump_csv(df,file_path=configur.get('BasePath','Path'),table_name=configur.get('table_extract','collection_category'))
+dump_csv(producttag_transformation
+        (
+        extract_data(spark=spark_session,table_name=configur.get('table_extract','product_tag'),
+        password=PASSWORD,user_name=USERNAME,fetech_size=configur.get('size','fetch_size'),
+        conn_url=CONN_URL)
+        ),file_path=configur.get('BasePath','Path'),table_name=configur.get('table_extract','product_tag')
+        )
+print('producttag')
+dump_csv(collection_category_transformation
+        (extract_data(spark=spark_session,table_name=configur.get('table_extract','collection_category'),
+                 password=PASSWORD,user_name=USERNAME,fetech_size=configur.get('size','fetch_size'),conn_url=CONN_URL)
+        ),file_path=configur.get('BasePath','Path'),table_name=configur.get('table_extract','collection_category'))
 
-df=extract_data(spark=spark_session,table_name=configur.get('table_extract','collection_category'),
-                password=PASSWORD,user_name=USERNAME,fetech_size=configur.get('size','fetch_size'),conn_url=CONN_URL)
-df=collection_category_tag_transformation(df)
-dump_csv(df,file_path=configur.get('BasePath','Path'),table_name=configur.get('table_extract','collection_category_tag'))
+print('collection_category_tag')
+dump_csv(collection_category_tag_transformation
+        (extract_data(spark=spark_session,table_name=configur.get('table_extract','collection_category_tag'),
+                 password=PASSWORD,user_name=USERNAME,fetech_size=configur.get('size','fetch_size'),conn_url=CONN_URL)
+        ),file_path=configur.get('BasePath','Path'),table_name=configur.get('table_extract','collection_category_tag'))
 
-df=extract_data(spark=spark_session,table_name=configur.get('table_extract','tag_cloud'),
-                password=PASSWORD,user_name=USERNAME,fetech_size=configur.get('size','fetch_size'),conn_url=CONN_URL)
-df=tag_cloud_transformation(df)
-dump_csv(df,file_path=configur.get('BasePath','Path'),table_name=configur.get('table_extract','tag_cloud'))
+print('tag_cloud')
+dump_csv(tag_cloud_transformation
+         (extract_data(spark=spark_session,table_name=configur.get('table_extract','tag_cloud'),
+                 password=PASSWORD,user_name=USERNAME,fetech_size=configur.get('size','fetch_size'),conn_url=CONN_URL)
+         ),file_path=configur.get('BasePath','Path'),table_name=configur.get('table_extract','tag_cloud'))
