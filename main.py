@@ -17,8 +17,6 @@ configur = ConfigParser()
 configur.read(BASE_PATH+'config.ini')
 spark_session=session(spark_driver=configur.get('driver_path_pyspark','pyspark'))
 
-
-
 print('product')
 dump_csv(product_transformation
         (
