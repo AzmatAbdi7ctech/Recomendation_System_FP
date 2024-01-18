@@ -200,3 +200,13 @@ def collection_FE_tag_join_df(collection_category_df, collection_category_tag_df
     data_df['tag_string'] = data_df[columns].apply(lambda row: ' '.join(row.values.astype(str)), axis=1)
     data_df = data_df.reset_index()
     return data_df
+
+
+def cosin_transformation(df):
+    df=df.select('*',round('cosin_score',3).alias('cosin_score_1')).\
+    withColumnRenamed('Product_A','original_product').\
+    withColumnRenamed('Product_B','matched_product')
+
+    df=df.toPandas()
+    df=df.drop(columns=['cosin_score','_c0'],axis=1).rename(columns={'cosin_score_1':'cosin_score'})
+    return df
