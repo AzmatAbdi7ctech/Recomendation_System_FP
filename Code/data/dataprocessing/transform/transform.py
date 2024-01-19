@@ -1,4 +1,5 @@
-from pyspark.sql.functions import concat,concat_ws
+from pyspark.sql.functions import concat,concat_ws,round
+
 def feature_list(df=None):
     """
     Extract feature lists from the input DataFrame.
@@ -203,10 +204,17 @@ def collection_FE_tag_join_df(collection_category_df, collection_category_tag_df
 
 
 def cosin_transformation(df):
-    df=df.select('*',round('cosin_score',3).alias('cosin_score_1')).\
-    withColumnRenamed('Product_A','original_product').\
-    withColumnRenamed('Product_B','matched_product')
-
+    try:
+        df=df.select('*',round('cosin_score',3).alias('cosin_score_1')).withColumnRenamed('Product_A','original_product').withColumnRenamed('Product_B','matched_product')
+    # print(df.columns())
+    # df.rename(columns={'Product_A':'original_product'})
+    # df=df['cosin_score'].round(2) 
+    except:
+        print('pandas dataframe')
     df=df.toPandas()
-    df=df.drop(columns=['cosin_score','_c0'],axis=1).rename(columns={'cosin_score_1':'cosin_score'})
+    # print(df.head())
+    # df=df.rename(columns={'cosin_score_1':'cosin_score'})
+    print(df.columns)
+    df=df[['original_product','matched_product','cosin_score_1']]
+    df=df.rename(columns={'cosin_score_1':'cosin_score'})
     return df
