@@ -2,6 +2,10 @@
 
 *.csv
 *.env
+<<<<<<< HEAD
 *.ini
 *.txt
 *.log
+=======
+*.ini
+>>>>>>> parent of dbaaf53 (validation script is done and uploading script is also done)

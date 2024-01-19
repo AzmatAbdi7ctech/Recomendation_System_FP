@@ -51,7 +51,7 @@ def model_train(df=None, model_name=None):
     embeddings = model.encode(product_tag_string, convert_to_tensor=True)
     cos_sim = util.cos_sim(embeddings, embeddings)
     
-    all_product_combination = {'cosin_score': [], 'Product_A': [], 'Product_B': []}   #//changes by sarcech
+    all_product_combination = {'cosin_score': [], 'Product_A': [], 'Product_B': []}
     
     for i in range(len(cos_sim)-1):
         for j in range(i+1, len(cos_sim)):
