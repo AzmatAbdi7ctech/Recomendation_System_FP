@@ -18,8 +18,11 @@ def collection_category_tag_transformation(df=None, column_list=None):
     # df = df.filter((df.status != 2) & (df.status_for_sale != 2))
 
     # Select the specified columns
-    df = df.select(column_list)
-
+    # column_list=['id','category_id','tag_id']
+    try:
+        df = df.select(column_list)
+    except:
+        print('colleciton category tag is not given')
     # Convert the DataFrame to a Pandas DataFrame
     df = df.toPandas()
 
