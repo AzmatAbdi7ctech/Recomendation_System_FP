@@ -21,8 +21,8 @@ def product_transformation(df=None, column_list=None):
     df = df.filter((df.status != 2) & (df.status_for_sale != 2))
 
     # Select the specified columns
-    columns = ['product_id', 'product_title', 'published_at', 'product_thumbnail', 'created_at', 'updated_at']
-    df = df.select(columns)
+    # columns = ['product_id', 'product_title', 'published_at', 'product_thumbnail', 'created_at', 'updated_at']
+    df = df.select(column_list)
 
     # Format date columns
     df = df.withColumn("published_at", date_format("published_at", "yyyy-MM-dd HH:mm:ss"))

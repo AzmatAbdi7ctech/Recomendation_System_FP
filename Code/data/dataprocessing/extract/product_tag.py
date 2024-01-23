@@ -24,7 +24,10 @@ def producttag_transformation(df=None, column_list=None):
     df = df.withColumn("updated_at", date_format("updated_at", "yyyy-MM-dd HH:mm:ss"))
 
     # Select the specified columns
-    df = df.select(column_list)
+    try:
+        df = df.select(column_list)
+    except: 
+        print("columns is not given")
 
     # Convert the DataFrame to a Pandas DataFrame
     df = df.toPandas()

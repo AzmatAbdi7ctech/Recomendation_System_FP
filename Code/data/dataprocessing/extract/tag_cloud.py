@@ -19,8 +19,8 @@ def tag_cloud_transformation(df=None, column_list=None):
     # df = df.filter((df.status != 2) & (df.status_for_sale != 2))
 
     # Select the specified columns
-    columns = ['id', 'tag_name']
-    df = df.select(columns)
+    # columns = ['id', 'tag_name']
+    df = df.select(column_list)
 
     # Convert the DataFrame to a Pandas DataFrame
     df = df.toPandas()

@@ -74,7 +74,7 @@ for i in cosin_df[1:]:
 #df.toPandas().to_csv('cosin_simmilarity1.csv')
 et = time.time()
 print(f'Execution time:{et-st} seconds')
-df.to_csv('cosin_simmilarity2.csv')
+df.to_csv('cosin_simmilarity_accesories.csv')
 
 
 
