@@ -5,8 +5,10 @@ FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC
 
+# Copy requirement file in working dir
+COPY requirements.txt /RecSys_fp/requirements.txt 
 # Set the working directory in the container
-WORKDIR /app
+WORKDIR /RecSys_fp
 
 # Install dependencies
 RUN apt-get update && \
@@ -36,12 +38,18 @@ RUN wget https://archive.apache.org/dist/spark/spark-3.5.0/spark-3.5.0-bin-hadoo
 ENV SPARK_HOME=/usr/local/spark
 ENV PATH=$PATH:$SPARK_HOME/bin
 
+# Download MySQL Connector/J separately
+RUN wget https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-8.0.28.tar.gz && \
+    tar -xzvf mysql-connector-java-8.0.28.tar.gz && \
+    mv mysql-connector-java-8.0.28/mysql-connector-java-8.0.28.jar /usr/local/spark/jars/mysql-connector-java-8.0.28.jar && \
+    rm -rf mysql-connector-java-8.0.28/ mysql-connector-java-8.0.28.tar.gz
+
 # Upgrade pip and install findspark pyspark and pandas
 RUN pip3 install --upgrade pip && \
-    pip3 install findspark pyspark pandas
+    pip3 install -r requirements.txt
 
 # Copy the current directory contents into the container at /app
-COPY . /app
+COPY . /RecSys_fp
 
 # Command to run your Python application
-CMD ["python3", "/app/RecSys.py"]
+CMD ["python3", "/RecSys_fp/main.py"]
