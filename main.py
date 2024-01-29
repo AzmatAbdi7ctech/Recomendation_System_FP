@@ -15,7 +15,8 @@ PASSWORD = os.getenv('PASSWORD')
 USERNAME=os.getenv('USER_NAME')
 configur = ConfigParser() 
 configur.read(BASE_PATH+'config.ini')
-spark_session=session(spark_driver=configur.get('driver_path_pyspark','pyspark'))
+spark_session=session()
+#spark_driver=configur.get('driver_path_pyspark','pyspark')
 
 try:
         dump_csv(product_transformation
