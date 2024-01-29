@@ -14,7 +14,8 @@ CONN_URL = os.getenv('CONN_URL')
 PASSWORD = os.getenv('PASSWORD')
 USERNAME=os.getenv('USER_NAME')
 configur = ConfigParser() 
-configur.read(BASE_PATH+'config.ini')
+configur.read(BASE_PATH+'config.ini')   #for dev
+#configur.read('/RecSys_fp/'+'config.ini')  for stagging
 spark_session=session()
 # spark_driver=configur.get('driver_path_pyspark','pyspark')
 try:
@@ -35,7 +36,7 @@ try:
         (
         extract_data(spark=spark_session,table_name=configur.get('table_extract','product_tag'),
         password=PASSWORD,user_name=USERNAME,fetech_size=configur.get('size','fetch_size'),
-        conn_url=CONN_URL,column_list=['product_id','tag_id'])
+        conn_url=CONN_URL),column_list=['product_id','tag_id']
         ),file_path=configur.get('BasePath','Path'),table_name=configur.get('table_extract','product_tag')
         )
         logging.info('--product tags table extracted--')
