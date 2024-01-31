@@ -28,8 +28,8 @@ for r in product_ids:
     cs2_product_b=[]
     cs3_product_b=[]
 
-    cs1_product_b=cs1[(cs1['Product_A']==r) & (cs1['cosin_score']>=.80)]['Product_B'].unique().tolist()  #[ product[0] for product in cs1.filter((cs1['Product_A']==r) & (cs1['cosin_score']>=.80))['Product_B'].unique()]
-    cs2_product_b=cs2[(cs2['Product_A']==r) & (cs2['cosin_score']>=.85)]['Product_B'].unique().tolist()#values
+    cs1_product_b=cs1[(cs1['Product_A']==r) & (cs1['cosin_score']>=.75)]['Product_B'].unique().tolist()  #[ product[0] for product in cs1.filter((cs1['Product_A']==r) & (cs1['cosin_score']>=.80))['Product_B'].unique()]
+    cs2_product_b=cs2[(cs2['Product_A']==r) & (cs2['cosin_score']>=.80)]['Product_B'].unique().tolist()#values
     cs3_product_b=cs3[(cs3['Product_A']==r) & (cs3['cosin_score']>=.90)]['Product_B'].unique().tolist()#values
     # cs2temp=cs2.filter((cs2['Product_A']==r) & (cs2['cosin_score']>=.85))
     # cs3temp=cs3.filter((cs3['Product_A']==r) & (cs3['cosin_score']>=.90))
@@ -73,8 +73,12 @@ for i in cosin_df[1:]:
     #      print('out of index')
 #df.toPandas().to_csv('cosin_simmilarity1.csv')
 et = time.time()
-print(f'Execution time:{et-st} seconds')
-df.to_csv('cosin_simmilarity_accesories.csv')
+logging.info(f'Execution time:{et-st} seconds')
+dump_csv(df,configur.get('cosin_similarity_base_path','path'),table_name=f"cosin_similarity_{datetime.date.today()}")
+df=load_csv(spark_session,file_path=f"{configur.get('cosin_similarity_base_path','path')}cosin_similarity_{datetime.date.today()}.csv")#f"{configur.get('cosin_similarity_base_path','path')}cosin_similarity_{datetime.date.today()}.csv")
+df=cosin_transformation(df)
+dump_csv(df,file_path=configur.get('cosin_similarity_base_path','path'), table_name=f"cosin_similarity_{datetime.date.today()}")
+
 
 
 
