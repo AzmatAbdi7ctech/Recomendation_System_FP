@@ -4,19 +4,26 @@ from Code.data.dataprocessing.transform.transform import *
 from sessions import *
 from pyspark.sql.functions import date_format
 from Code.models.model_training.model import *
-
-
-BASE_PATH=os.getenv('BASEPATH')
-CONN_URL = os.getenv('CONN_URL')
-PASSWORD = os.getenv('PASSWORD')
-USERNAME=os.getenv('USER_NAME')
+from Code.utils.logs import *
+BASE_PATH='D:/PROJECTS/Recomendation_System_FP/Code/'   #change base path according to your directory
 configur = ConfigParser() 
-configur.read(BASE_PATH+'config.ini')
-#spark_session=session(configur.get('driver_path_pyspark','pyspark'))
-cs1=pd.read_csv(configur.get('cosin_similarity_base_path','cs1'))#load_csv(spark_session,file_path=configur.get('cosin_similarity_base_path','cs1'))
-cs2=pd.read_csv(configur.get('cosin_similarity_base_path','cs2'))#load_csv(spark=spark_session,file_path=configur.get('cosin_similarity_base_path','cs2'))
-cs3=pd.read_csv(configur.get('cosin_similarity_base_path','cs3'))#Sload_csv(spark=spark_session,file_path=configur.get('cosin_similarity_base_path','cs3'))
+configur.read(BASE_PATH+'config.ini')   #for dev
+#configur.read('/RecSys_fp/'+'config.ini')  for stagging
+spark_session=session(configur.get('driver_path_pyspark','pyspark'))
 
+th1=.75
+th2=.75
+th3=.75
+val_path=f"{configur.get('BasePath','path')}{configur.get('cosin_similarity_base_path','path')}{str(time.strftime('%Y_%m_%d'))}/"  
+cosin_path1=f"{configur.get('BasePath','path')}{configur.get('cosin_similarity_base_path','path')}{str(time.strftime('%Y_%m_%d'))}/{configur.get('cosin_similarity_base_path','cs1')}"
+cosin_path2=f"{configur.get('BasePath','path')}{configur.get('cosin_similarity_base_path','path')}{str(time.strftime('%Y_%m_%d'))}/{configur.get('cosin_similarity_base_path','cs1')}"
+cosin_path3=f"{configur.get('BasePath','path')}{configur.get('cosin_similarity_base_path','path')}{str(time.strftime('%Y_%m_%d'))}/{configur.get('cosin_similarity_base_path','cs1')}"
+
+logging.infor('cosin csv started reading')
+cs1=pd.read_csv(cosin_path1)#load_csv(spark_session,file_path=configur.get('cosin_similarity_base_path','cs1'))
+cs2=pd.read_csv(cosin_path2)#load_csv(spark=spark_session,file_path=configur.get('cosin_similarity_base_path','cs2'))
+cs3=pd.read_csv(cosin_path3)#Sload_csv(spark=spark_session,file_path=configur.get('cosin_similarity_base_path','cs3'))
+logging.infor('cosin csv ended reading')
 cosin_df=[]
 
 product_ids=cs1.Product_A.unique()#[id[0] for id in cs1.select('Product_A').distinct().collect()]  in pyspark [8692,2178,8687,1087,3069]
@@ -27,27 +34,13 @@ for r in product_ids:
     cs1_product_b=[]
     cs2_product_b=[]
     cs3_product_b=[]
+    try:
+        cs1_product_b=cs1[(cs1['Product_A']==r) & (cs1['cosin_score']>=th1)]['Product_B'].unique().tolist()  #[ product[0] for product in cs1.filter((cs1['Product_A']==r) & (cs1['cosin_score']>=.80))['Product_B'].unique()]
+        cs2_product_b=cs2[(cs2['Product_A']==r) & (cs2['cosin_score']>=th2)]['Product_B'].unique().tolist()#values
+        cs3_product_b=cs3[(cs3['Product_A']==r) & (cs3['cosin_score']>=th3)]['Product_B'].unique().tolist()#values
+    except:
+        logging.info('product does not exit in csv')
 
-    cs1_product_b=cs1[(cs1['Product_A']==r) & (cs1['cosin_score']>=.75)]['Product_B'].unique().tolist()  #[ product[0] for product in cs1.filter((cs1['Product_A']==r) & (cs1['cosin_score']>=.80))['Product_B'].unique()]
-    cs2_product_b=cs2[(cs2['Product_A']==r) & (cs2['cosin_score']>=.80)]['Product_B'].unique().tolist()#values
-    cs3_product_b=cs3[(cs3['Product_A']==r) & (cs3['cosin_score']>=.90)]['Product_B'].unique().tolist()#values
-    # cs2temp=cs2.filter((cs2['Product_A']==r) & (cs2['cosin_score']>=.85))
-    # cs3temp=cs3.filter((cs3['Product_A']==r) & (cs3['cosin_score']>=.90))
-
-    # for row in  cs1temp.collect():
-    #     if float(row['cosin_score'])>=.80:
-    #         cs1_product_b.append(row['Product_B'])
-        
-    # for row2 in cs2temp.collect():
-    #     if float(row2['cosin_score'])>=.85:
-    #         cs1_product_b.append(row2['Product_B'])
-    #         # cs2_product_b.append(row2['Product_B'])
-    # for row3 in cs3temp.collect():
-    #     if float(row3['cosin_score'])>=.90 :
-    #         cs1_product_b.append(row3['Product_B'])
-                # cs3_product_b.append(row3['Product_B'])
-
-#print(cs1_product_b,cs2_product_b,cs3_product_b)
     for id in cs2_product_b:
         cs1_product_b.append(id)
     for id in cs3_product_b:
@@ -64,21 +57,24 @@ for r in product_ids:
     # cosin_df.append(cs1.filter((cs1['Product_A']==r) & (cs1['Product_B'].isin(top_recomendation))))  # in pandas
 
 df=cosin_df[0]
-print(len(cosin_df[1:]))
+
 for i in cosin_df[1:]:
-    #  try:
+    try:
          #df=df.union(i) #in pyspark
          df=df._append(i,ignore_index = True) #in pandas
-    #  except:
-    #      print('out of index')
+    except:
+         print('out of index')
 #df.toPandas().to_csv('cosin_simmilarity1.csv')
 et = time.time()
 logging.info(f'Execution time:{et-st} seconds')
-dump_csv(df,configur.get('cosin_similarity_base_path','path'),table_name=f"cosin_similarity_{datetime.date.today()}")
-df=load_csv(spark_session,file_path=f"{configur.get('cosin_similarity_base_path','path')}cosin_similarity_{datetime.date.today()}.csv")#f"{configur.get('cosin_similarity_base_path','path')}cosin_similarity_{datetime.date.today()}.csv")
-df=cosin_transformation(df)
-dump_csv(df,file_path=configur.get('cosin_similarity_base_path','path'), table_name=f"cosin_similarity_{datetime.date.today()}")
 
+logging.info('valdation csv part done')
+dump_csv(df,val_path,table_name=f"cosin_similarity_{datetime.date.today()}")
+df=load_csv(spark_session,file_path=val_path,file_name=f"cosin_similarity_{datetime.date.today()}.csv")#f"{configur.get('cosin_similarity_base_path','path')}cosin_similarity_{datetime.date.today()}.csv")
+df=cosin_transformation(df)
+dump_csv(df,val_path,table_name=f"cosin_similarity_{datetime.date.today()}")
+
+logging.info(f'validation csv saved {val_path} cosin_similarity_{datetime.date.today()}')
 
 
 

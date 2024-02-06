@@ -1,4 +1,5 @@
 from pyspark.sql.functions import concat,concat_ws
+import numpy as np
 def feature_list(df=None):
     """
     Extract feature lists from the input DataFrame.
@@ -210,3 +211,42 @@ def cosin_transformation(df):
     df=df.toPandas()
     df=df.drop(columns=['cosin_score','_c0'],axis=1).rename(columns={'cosin_score_1':'cosin_score'})
     return df
+
+
+
+def combine_cosin_df(cosin_accessories_df,cosin_clothing_df,product_tag_df,tag_cloud_df,Product_df,collection_category_tag_df,feature_accesories_df,feature_clothing_df):
+
+
+    product_tag_name_df=product_tag_df.join(tag_cloud_df,product_tag_df.tag_id==tag_cloud_df.id)
+    product_tag_name_df=product_tag_name_df.join(Product_df,Product_df.product_id==product_tag_name_df.product_id,'inner')
+    product_tag_name_df=duplicate_col(product_tag_name_df)
+    product_tag_name_df=product_tag_name_df.select(['product_id','tag_id','id','tag_name','product_title'])
+    product_tag_name_collection_df=product_tag_name_df.join(collection_category_tag_df,product_tag_name_df.tag_id==collection_category_tag_df.tag_id)
+    product_accesories_ids=[  int(i) for i in np.unique(product_tag_name_collection_df.filter
+    (product_tag_name_collection_df['category_id'].isin(
+        
+        feature_accesories_df['category_collection_FE']
+        
+    )).select('product_id').collect())]
+    product_clothing_ids=[ int(i)  for i in np.unique(product_tag_name_collection_df.filter
+    (product_tag_name_collection_df['category_id'].isin(
+     feature_clothing_df['category_collection_FE']
+
+    )).select('product_id').collect())]
+    
+    #--testing cosin csv--#
+        # import pandas as pd
+        # cosin_clothing_df.to_csv('cosin_clothing_df.csv')
+        # cosin_accessories_df.to_csv('cosin_accessories_df.csv')
+    #--testing cosin csv--#
+    cosin_clothing_df=cosin_clothing_df[~cosin_clothing_df['Product_A'].isin(product_accesories_ids)]
+    cosin_accessories_df=cosin_accessories_df[~cosin_accessories_df['Product_A'].isin(product_clothing_ids)]
+    #--wrote for pyspark--#
+    # cosin_accessories_df=cosin_accessories_df.filter(~cosin_accessories_df['Product_B'].isin(product_clothing_ids))  
+    # cosin_clothing_df=cosin_clothing_df.filter(~cosin_clothing_df['Product_B'].isin(product_accesories_ids))
+    # cosin_clothing_df=cosin_clothing_df.toPandas()
+    # cosin_accessories_df=cosin_accessories_df.toPandas()
+    #--wrote for pyspark--#
+    merge_csv=cosin_accessories_df._append(cosin_clothing_df,ignore_index = True)  
+    merge_csv=merge_csv[['cosin_score',  'Product_A'  ,'Product_B']]
+    return merge_csv  
