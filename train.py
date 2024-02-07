@@ -147,52 +147,52 @@ dump_csv(
 logging.info (f"cosin ended {configur.get('product_transformation','product_t1_clothing')}")
 
 
-# logging.info (f"cosin started {configur.get('product_transformation','product_t2_clothing')}")
-# dump_csv(
-#     combine_cosin_df(
-#                     #accesories_df,clothing_df,
-#                     model_train(
-#                      load_csv(spark_session,
-#                      transformation_csv_path,configur.get('product_transformation','product_t2_clothing')),
-#                      model_artifact(model_artifact_df,
-#                      configur.get('model','model_version'))    ),
+logging.info (f"cosin started {configur.get('product_transformation','product_t2_clothing')}")
+dump_csv(
+    combine_cosin_df(
+                    #accesories_df,clothing_df,
+                    model_train(
+                     load_csv(spark_session,
+                     transformation_csv_path,configur.get('product_transformation','product_t2_clothing')),
+                     model_artifact(model_artifact_df,
+                     configur.get('model','model_version'))    ),
 
                      
-#                     model_train(
-#                     load_csv(spark_session,
-#                     transformation_csv_path,configur.get('product_transformation','product_t2_accessories')),
-#                     model_artifact(model_artifact_df,
-#                     configur.get('model','model_version'))    ),
-#                     Product_tag_df,Tag_cloud_df,Product_df,Collection_Category_tag_df,feature_accesories,feature_clothing
-#                      ),
+                    model_train(
+                    load_csv(spark_session,
+                    transformation_csv_path,configur.get('product_transformation','product_t2_accessories')),
+                    model_artifact(model_artifact_df,
+                    configur.get('model','model_version'))    ),
+                    Product_tag_df,Tag_cloud_df,Product_df,Collection_Category_tag_df,feature_accesories,feature_clothing
+                     ),
                      
-#                      file_path=cosin_path,
-#                      table_name=configur.get('product_transformation_path','product_t2')
-# )
+                     file_path=cosin_path,
+                     table_name=configur.get('product_transformation_path','product_t2')
+)
 
-# logging.info (f"cosin ended {configur.get('product_transformation','product_t2_clothing')}")
-# logging.info (f"cosin started {configur.get('product_transformation','product_t3_clothing')}")
-# dump_csv(
-#     combine_cosin_df(
-#                     #accesories_df,clothing_df,
-#                     model_train(
-#                      load_csv(spark_session,
-#                      transformation_csv_path,configur.get('product_transformation','product_t3_clothing')),
-#                      model_artifact(model_artifact_df,
-#                      configur.get('model','model_version'))    ),
+logging.info (f"cosin ended {configur.get('product_transformation','product_t2_clothing')}")
+logging.info (f"cosin started {configur.get('product_transformation','product_t3_clothing')}")
+dump_csv(
+    combine_cosin_df(
+                    #accesories_df,clothing_df,
+                    model_train(
+                     load_csv(spark_session,
+                     transformation_csv_path,configur.get('product_transformation','product_t3_clothing')),
+                     model_artifact(model_artifact_df,
+                     configur.get('model','model_version'))    ),
 
-#                     model_train(
-#                     load_csv(spark_session,
-#                     transformation_csv_path,configur.get('product_transformation','product_t3_accessories')),
-#                     model_artifact(model_artifact_df,
-#                     configur.get('model','model_version'))    ),
-#                     Product_tag_df,Tag_cloud_df,Product_df,Collection_Category_tag_df,feature_accesories,feature_clothing
-#                      ),
+                    model_train(
+                    load_csv(spark_session,
+                    transformation_csv_path,configur.get('product_transformation','product_t3_accessories')),
+                    model_artifact(model_artifact_df,
+                    configur.get('model','model_version'))    ),
+                    Product_tag_df,Tag_cloud_df,Product_df,Collection_Category_tag_df,feature_accesories,feature_clothing
+                     ),
                      
-#                      file_path=cosin_path,
-#                      table_name=configur.get('product_transformation_path','product_t3')
-# )
+                     file_path=cosin_path,
+                     table_name=configur.get('product_transformation_path','product_t3')
+)
 
-# logging.info (f"cosin ended {configur.get('product_transformation','product_t3_clothing')}")
+logging.info (f"cosin ended {configur.get('product_transformation','product_t3_clothing')}")
 
 
