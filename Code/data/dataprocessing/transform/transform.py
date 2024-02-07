@@ -1,5 +1,6 @@
 from pyspark.sql.functions import concat,concat_ws
 import numpy as np
+from pyspark.sql.types import IntegerType,FloatType
 def feature_list(df=None):
     """
     Extract feature lists from the input DataFrame.
@@ -204,12 +205,13 @@ def collection_FE_tag_join_df(collection_category_df, collection_category_tag_df
 
 
 def cosin_transformation(df):
-    df=df.select('*',round('cosin_score',3).alias('cosin_score_1')).\
-    withColumnRenamed('Product_A','original_product').\
+    df=df.withColumn('cosin_score',df.cosin_score.cast(FloatType()))
+    df=df.withColumnRenamed('Product_A','original_product').\
     withColumnRenamed('Product_B','matched_product')
-
     df=df.toPandas()
-    df=df.drop(columns=['cosin_score','_c0'],axis=1).rename(columns={'cosin_score_1':'cosin_score'})
+    df['cosin_score']=df['cosin_score'].round(3)
+    # df=df.drop(columns=['cosin_score','_c0'],axis=1).rename(columns={'cosin_score_1':'cosin_score'})
+    df=df[['original_product','matched_product','cosin_score']]
     return df
 
 

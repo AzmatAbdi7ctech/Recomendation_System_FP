@@ -9,15 +9,27 @@ from Code.data.dataprocessing.extract.tag_cloud  import *
 from sessions import *
 from pyspark.sql.functions import date_format
 from Code.utils.logs import *
-BASE_PATH='D:/PROJECTS/Recomendation_System_FP/Code/'
+import os
+print('My nested folder : ', os.getcwd())
+
+confing_name='config.ini'
+BASE_PATH=os.getcwd()
 configur = ConfigParser() 
-configur.read(BASE_PATH+'config.ini')   #for dev
-#configur.read('/RecSys_fp/'+'config.ini')  for stagging
+print(str(os.path.join(BASE_PATH,'Code',confing_name)).replace('\\', '/'))
+configur.read(os.path.join(BASE_PATH,'Code',confing_name)  ) #for dev
 CONN_URL = configur.get('credantials','CONN_URL')
 PASSWORD = configur.get('credantials','PASSWORD')
 USERNAME=configur.get('credantials','USER_NAME')
 spark_session=session()
-databse_csv_path=f"{configur.get('BasePath','Path')}Code/Database/"
+databse_csv_path=f"{BASE_PATH}/Code/Database/"
+
+path=f'{BASE_PATH}/Code/logs/'
+try:
+    os.makedirs(path)
+    print(path)
+except:
+        logging.info(f"FOLDER ALREADY EXIST{path}")
+
 try:
     os.makedirs(databse_csv_path)
     print(databse_csv_path)
@@ -44,7 +56,7 @@ try:
         extract_data(spark=spark_session,table_name=configur.get('table_extract','product_tag'),
         password=PASSWORD,user_name=USERNAME,fetech_size=configur.get('size','fetch_size'),
         conn_url=CONN_URL),column_list=['product_id','tag_id']
-        ),file_path=configur.get('BasePath','Path'),table_name=configur.get('table_extract','product_tag')
+        ),file_path=databse_csv_path,table_name=configur.get('table_extract','product_tag')
         )
         logging.info('--product tags table extracted--')
 except:

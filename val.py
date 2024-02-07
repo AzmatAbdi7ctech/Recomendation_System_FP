@@ -5,28 +5,31 @@ from sessions import *
 from pyspark.sql.functions import date_format
 from Code.models.model_training.model import *
 from Code.utils.logs import *
-BASE_PATH='D:/PROJECTS/Recomendation_System_FP/Code/'   #change base path according to your directory
+
+confing_name='config.ini'
+BASE_PATH=os.getcwd()
 configur = ConfigParser() 
-configur.read(BASE_PATH+'config.ini')   #for dev
-#configur.read('/RecSys_fp/'+'config.ini')  for stagging
+configur.read(os.path.join(BASE_PATH,'Code',confing_name)  ) #for dev
+spark_session=session(configur.get('driver_path_pyspark','pyspark'))
+cosin_path=str(os.path.join(BASE_PATH,'Code','cosin_similarity_registry')).replace('\\', '/')
 spark_session=session(configur.get('driver_path_pyspark','pyspark'))
 
 th1=.75
 th2=.75
 th3=.75
-val_path=f"{configur.get('BasePath','path')}{configur.get('cosin_similarity_base_path','path')}{str(time.strftime('%Y_%m_%d'))}/"  
-cosin_path1=f"{configur.get('BasePath','path')}{configur.get('cosin_similarity_base_path','path')}{str(time.strftime('%Y_%m_%d'))}/{configur.get('cosin_similarity_base_path','cs1')}"
-cosin_path2=f"{configur.get('BasePath','path')}{configur.get('cosin_similarity_base_path','path')}{str(time.strftime('%Y_%m_%d'))}/{configur.get('cosin_similarity_base_path','cs1')}"
-cosin_path3=f"{configur.get('BasePath','path')}{configur.get('cosin_similarity_base_path','path')}{str(time.strftime('%Y_%m_%d'))}/{configur.get('cosin_similarity_base_path','cs1')}"
+val_path=f"{cosin_path}/{str(time.strftime('%Y_%m_%d'))}/"  
+cosin_path1=f"{cosin_path}/{str(time.strftime('%Y_%m_%d'))}/{configur.get('cosin_similarity_base_path','cs1')}"
+cosin_path2=f"{cosin_path}/{str(time.strftime('%Y_%m_%d'))}/{configur.get('cosin_similarity_base_path','cs1')}"
+cosin_path3=f"{cosin_path}/{str(time.strftime('%Y_%m_%d'))}/{configur.get('cosin_similarity_base_path','cs1')}"
 
-logging.infor('cosin csv started reading')
+logging.info('cosin csv started reading')
 cs1=pd.read_csv(cosin_path1)#load_csv(spark_session,file_path=configur.get('cosin_similarity_base_path','cs1'))
 cs2=pd.read_csv(cosin_path2)#load_csv(spark=spark_session,file_path=configur.get('cosin_similarity_base_path','cs2'))
 cs3=pd.read_csv(cosin_path3)#Sload_csv(spark=spark_session,file_path=configur.get('cosin_similarity_base_path','cs3'))
-logging.infor('cosin csv ended reading')
+logging.info('cosin csv ended reading')
 cosin_df=[]
 
-product_ids=cs1.Product_A.unique()#[id[0] for id in cs1.select('Product_A').distinct().collect()]  in pyspark [8692,2178,8687,1087,3069]
+product_ids=[8692,2178,8687,1087,3069]#cs1.Product_A.unique()#[id[0] for id in cs1.select('Product_A').distinct().collect()]  in pyspark 
 print("total number of product",len(product_ids))
 st = time.time()
 for r in product_ids:
@@ -70,7 +73,8 @@ logging.info(f'Execution time:{et-st} seconds')
 
 logging.info('valdation csv part done')
 dump_csv(df,val_path,table_name=f"cosin_similarity_{datetime.date.today()}")
-df=load_csv(spark_session,file_path=val_path,file_name=f"cosin_similarity_{datetime.date.today()}.csv")#f"{configur.get('cosin_similarity_base_path','path')}cosin_similarity_{datetime.date.today()}.csv")
+df=load_csv(spark_session,file_path=val_path,file_name=f"cosin_similarity_{datetime.date.today()}")#f"{configur.get('cosin_similarity_base_path','path')}cosin_similarity_{datetime.date.today()}.csv")
+print(df.show())
 df=cosin_transformation(df)
 dump_csv(df,val_path,table_name=f"cosin_similarity_{datetime.date.today()}")
 
