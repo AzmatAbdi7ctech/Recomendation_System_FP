@@ -11,6 +11,8 @@ BASE_PATH=os.getcwd()
 configur = ConfigParser() 
 configur.read(os.path.join(BASE_PATH,'Code',confing_name)  ) #for dev
 spark_session=session(configur.get('driver_path_pyspark','pyspark'))
+databse_csv_path=f"{BASE_PATH}/Code/Database/"
+
 cosin_path=str(os.path.join(BASE_PATH,'Code','cosin_similarity_registry')).replace('\\', '/')
 spark_session=session(configur.get('driver_path_pyspark','pyspark'))
 
@@ -21,7 +23,7 @@ val_path=f"{cosin_path}/{str(time.strftime('%Y_%m_%d'))}/"
 cosin_path1=f"{cosin_path}/{str(time.strftime('%Y_%m_%d'))}/{configur.get('cosin_similarity_base_path','cs1')}"
 cosin_path2=f"{cosin_path}/{str(time.strftime('%Y_%m_%d'))}/{configur.get('cosin_similarity_base_path','cs1')}"
 cosin_path3=f"{cosin_path}/{str(time.strftime('%Y_%m_%d'))}/{configur.get('cosin_similarity_base_path','cs1')}"
-
+Product_df=load_csv(spark_session,databse_csv_path,configur.get('dataframe','product'))
 logging.info('cosin csv started reading')
 cs1=pd.read_csv(cosin_path1)#load_csv(spark_session,file_path=configur.get('cosin_similarity_base_path','cs1'))
 cs2=pd.read_csv(cosin_path2)#load_csv(spark=spark_session,file_path=configur.get('cosin_similarity_base_path','cs2'))
@@ -29,7 +31,7 @@ cs3=pd.read_csv(cosin_path3)#Sload_csv(spark=spark_session,file_path=configur.ge
 logging.info('cosin csv ended reading')
 cosin_df=[]
 
-product_ids=[8692,2178,8687,1087,3069]#cs1.Product_A.unique()#[id[0] for id in cs1.select('Product_A').distinct().collect()]  in pyspark 
+product_ids=cs1.Product_A.unique()#cs1.Product_A.unique()#[id[0] for id in cs1.select('Product_A').distinct().collect()]#[8692,2178,8687,1087,3069]#cs1.Product_A.unique()#[id[0] for id in cs1.select('Product_A').distinct().collect()]  in pyspark 
 print("total number of product",len(product_ids))
 st = time.time()
 for r in product_ids:
@@ -74,10 +76,12 @@ logging.info(f'Execution time:{et-st} seconds')
 logging.info('valdation csv part done')
 dump_csv(df,val_path,table_name=f"cosin_similarity_{datetime.date.today()}")
 df=load_csv(spark_session,file_path=val_path,file_name=f"cosin_similarity_{datetime.date.today()}")#f"{configur.get('cosin_similarity_base_path','path')}cosin_similarity_{datetime.date.today()}.csv")
-print(df.show())
 df=cosin_transformation(df)
-dump_csv(df,val_path,table_name=f"cosin_similarity_{datetime.date.today()}")
 
+df=date_difference(Product_df,df)
+
+dump_csv(df,val_path,table_name=f"cosin_similarity_{datetime.date.today()}")
+print(df.head())
 logging.info(f'validation csv saved {val_path} cosin_similarity_{datetime.date.today()}')
 
 

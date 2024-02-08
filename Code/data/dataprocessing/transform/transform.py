@@ -1,4 +1,5 @@
 from pyspark.sql.functions import concat,concat_ws
+from pyspark.sql.functions import datediff,to_date,col
 import numpy as np
 from pyspark.sql.types import IntegerType,FloatType
 def feature_list(df=None):
@@ -208,12 +209,28 @@ def cosin_transformation(df):
     df=df.withColumn('cosin_score',df.cosin_score.cast(FloatType()))
     df=df.withColumnRenamed('Product_A','original_product').\
     withColumnRenamed('Product_B','matched_product')
-    df=df.toPandas()
-    df['cosin_score']=df['cosin_score'].round(3)
+    # df=df.toPandas()
+    # df['cosin_score']=df['cosin_score'].round(3)
     # df=df.drop(columns=['cosin_score','_c0'],axis=1).rename(columns={'cosin_score_1':'cosin_score'})
-    df=df[['original_product','matched_product','cosin_score']]
+    df=df.select(['original_product','matched_product','cosin_score'])
     return df
 
+
+def date_difference(Product_df,cosin_df):
+    cosin_date=Product_df.join(cosin_df,cosin_df.original_product==Product_df.product_id,'inner')
+    cosin_date=cosin_date.withColumnRenamed('published_at','reference_date').select(['original_product','matched_product','reference_date','cosin_score'])
+    cosin_date=cosin_date.join(Product_df,Product_df.product_id==cosin_date.matched_product,'inner').select(['original_product','matched_product','reference_date','cosin_score','published_at'])
+    cosin_date=cosin_date.withColumn('datediff',datediff(to_date('reference_date'),to_date('published_at')))
+    cosin_date=cosin_date.withColumn('cosin_score_2',col('cosin_score')*col('datediff'))
+    cosin_date=cosin_date.select(['original_product','matched_product','cosin_score_2'])
+    cosin_date=cosin_date.withColumnRenamed('cosin_score_2','cosin_score')
+    # cosin_date=cosin_date.select('*',round('cosin_score',3).alias('cosin_score_1'))
+    cosin_date=cosin_date.select(['original_product','matched_product','cosin_score'])
+    # cosin_date=cosin_date.withColumnRenamed('cosin_score_1','cosin_score')
+    cosin_date=cosin_date.toPandas()
+    cosin_date['cosin_score']=cosin_date['cosin_score'].round(3)
+    cosin_date=cosin_date[['original_product','matched_product','cosin_score']]
+    return cosin_date
 
 
 def combine_cosin_df(cosin_accessories_df,cosin_clothing_df,product_tag_df,tag_cloud_df,Product_df,collection_category_tag_df,feature_accesories_df,feature_clothing_df):

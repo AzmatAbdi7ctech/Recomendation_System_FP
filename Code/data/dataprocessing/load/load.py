@@ -40,7 +40,9 @@ def dump_csv(df=None, file_path=None, format='csv',table_name=None):
     if format.lower() == 'csv':
         
         # df.to_csv(f'{file_path+table_name}.csv', index=False)  for dev
-        df.to_csv(f'{file_path}{table_name}.csv')   #for stagging
+        df.to_csv(f'{file_path}{table_name}.csv',index=False)   #for stagging
         print("file saved",table_name)
     else:
         raise ValueError("Unsupported format. Currently, only 'csv' format is supported.")
+    
+
