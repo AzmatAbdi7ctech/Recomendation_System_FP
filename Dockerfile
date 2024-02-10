@@ -1,6 +1,6 @@
 # Use an official Ubuntu image as a parent image
-#FROM ubuntu:20.04
-FROM python:3.8.10
+FROM ubuntu:20.04
+#FROM python:3.8.10
 # Set environment variables to avoid time zone prompt
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC
